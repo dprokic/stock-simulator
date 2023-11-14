@@ -8,8 +8,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import rs.proka.stocksimulator.market.api.message.StockMarketPriceTimeSeriesDto;
+import rs.proka.stocksimulator.market.domain.MarketService;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -20,11 +22,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class MarketController {
     public static final String PATH = "/market";
 
+    private final MarketService marketService;
+
     @GetMapping("/")
     @Operation(summary = "Get market price", description = "Get market price")
     @ApiResponse(responseCode = "200", description = "successful operation",
             content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StockMarketPriceTimeSeriesDto.class ))})
-    public StockMarketPriceTimeSeriesDto getMarketPrice() {
+    public StockMarketPriceTimeSeriesDto getMarketPrice(@RequestParam(name = "symbol", required = false) final String symbol) {
         return StockMarketPriceTimeSeriesDto.empty();
     }
 
