@@ -29,7 +29,7 @@ public class MarketController {
     @ApiResponse(responseCode = "200", description = "successful operation",
             content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StockMarketPriceTimeSeriesDto.class ))})
     public StockMarketPriceTimeSeriesDto getMarketPrice(@RequestParam(name = "symbol", required = false) final String symbol) {
-        return StockMarketPriceTimeSeriesDto.empty();
+        return StockMarketPriceTimeSeriesDto.fromMarketPriceTimeSeries(marketService.getMarketPriceTimeSeries(symbol));
     }
 
 }

@@ -2,6 +2,7 @@ package rs.proka.stocksimulator.market.api.message;
 
 import lombok.Builder;
 import lombok.Getter;
+import rs.proka.stocksimulator.market.domain.MarketPriceTimeSeriesItem;
 
 import java.time.LocalDate;
 
@@ -16,4 +17,14 @@ public class StockMarketPriceTimeSeriesItemDto {
     private final Double close;
     private final Long volume;
 
+    public static StockMarketPriceTimeSeriesItemDto fromItem(MarketPriceTimeSeriesItem item) {
+        return StockMarketPriceTimeSeriesItemDto.builder()
+                .date(item.getDate())
+                .open(item.getOpen())
+                .high(item.getHigh())
+                .low(item.getLow())
+                .close(item.getClose())
+                .volume(item.getVolume())
+                .build();
+    }
 }
