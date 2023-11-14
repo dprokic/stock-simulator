@@ -1,0 +1,3 @@
+stock:
+  api:
+    v1Path: "/api/v1"
