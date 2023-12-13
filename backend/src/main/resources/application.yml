@@ -1,3 +1,13 @@
 stock:
   api:
     v1Path: "/api/v1"
+  cache:
+    maxSize: 3
+
+logging:
+  level:
+    rs:
+      proka:
+        stocksimulator:
+          market:
+            domain: DEBUG

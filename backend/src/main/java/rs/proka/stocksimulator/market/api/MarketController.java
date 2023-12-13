@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import rs.proka.stocksimulator.market.api.message.StockMarketPriceTimeSeriesDto;
 import rs.proka.stocksimulator.market.domain.MarketService;
+import rs.proka.stocksimulator.market.domain.Ticker;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -29,7 +30,7 @@ public class MarketController {
     @ApiResponse(responseCode = "200", description = "successful operation",
             content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StockMarketPriceTimeSeriesDto.class ))})
     public StockMarketPriceTimeSeriesDto getMarketPrice(@RequestParam(name = "symbol", required = false) final String symbol) {
-        return StockMarketPriceTimeSeriesDto.fromMarketPriceTimeSeries(marketService.getMarketPriceTimeSeries(symbol));
+        return StockMarketPriceTimeSeriesDto.fromMarketPriceTimeSeries(marketService.getMarketPriceTimeSeries(new Ticker(symbol)));
     }
 
 }
