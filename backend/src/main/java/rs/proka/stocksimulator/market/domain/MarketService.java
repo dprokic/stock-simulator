@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -23,5 +24,11 @@ public class MarketService {
         List<MarketPriceTimeSeriesItem> marketPriceTimeSeries = marketPriceFetcher.getMarketPriceTimeSeries(ticker);
         markerPriceCache.put(ticker, marketPriceTimeSeries);
         return marketPriceTimeSeries;
+    }
+
+    public List<MarketPriceTimeSeriesItem> getMarketPricesForTimeInterval(Ticker ticker, LocalDate intervalStart, LocalDate intervalEnd) {
+        return getMarketPriceTimeSeries(ticker).stream()
+                .filter(item -> !item.getDate().isBefore(intervalStart) && !item.getDate().isAfter(intervalEnd))
+                .toList();
     }
 }

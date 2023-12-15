@@ -48,6 +48,7 @@ public class MarketPriceFetcherAlphaVantage implements MarketPriceFetcher {
                         .build());
             }
         }
+        transformedItems.sort(Comparator.comparing(MarketPriceTimeSeriesItem::getDate));
         return transformedItems;
     }
 }
