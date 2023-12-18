@@ -2,7 +2,7 @@ package rs.proka.stocksimulator.backtest.domain;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import rs.proka.stocksimulator.market.domain.MarketPriceTimeSeriesItem;
+import rs.proka.stocksimulator.market.domain.MarketDay;
 import rs.proka.stocksimulator.market.domain.MarketService;
 import rs.proka.stocksimulator.market.domain.Ticker;
 
@@ -17,7 +17,7 @@ public class BacktestService {
     private final MarketService marketService;
 
     public StockMarketBacktestResult getStrategyBacktested(Ticker ticker, LocalDate intervalStartDate, LocalDate intervalEndDate, String strategyName, Map<String, String> customParams) {
-        List<MarketPriceTimeSeriesItem> marketDays = marketService.getMarketPricesForTimeInterval(ticker, intervalStartDate, intervalEndDate);
+        List<MarketDay> marketDays = marketService.getMarketPricesForTimeInterval(ticker, intervalStartDate, intervalEndDate);
         BacktestStrategy strategy = getStrategy(strategyName, customParams);
         return strategy.backtest(marketDays);
     }

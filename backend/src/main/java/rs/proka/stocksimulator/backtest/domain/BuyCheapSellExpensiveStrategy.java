@@ -1,7 +1,7 @@
 package rs.proka.stocksimulator.backtest.domain;
 
 import lombok.RequiredArgsConstructor;
-import rs.proka.stocksimulator.market.domain.MarketPriceTimeSeriesItem;
+import rs.proka.stocksimulator.market.domain.MarketDay;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -17,33 +17,33 @@ public class BuyCheapSellExpensiveStrategy implements BacktestStrategy {
     private final Double sellValue;
 
     @Override
-    public StockMarketBacktestResult backtest(List<MarketPriceTimeSeriesItem> marketPricesForTimeInterval) {
-        List<BacktestedDay> days = new LinkedList<>();
+    public StockMarketBacktestResult backtest(List<MarketDay> marketDays) {
+        List<BacktestedDay> backtestedDays = new LinkedList<>();
 
-        Iterator<MarketPriceTimeSeriesItem> marketDaysIterator = marketPricesForTimeInterval.iterator();
+        Iterator<MarketDay> marketDaysIterator = marketDays.iterator();
         BacktestedDay latestBacktestedDay = getInitialBacktestedDay(initialBudget, marketDaysIterator.next());
-        days.add(latestBacktestedDay);
+        backtestedDays.add(latestBacktestedDay);
         Double latestTransactionPrice = latestBacktestedDay.getMarketDay().getClose();
 
         while (marketDaysIterator.hasNext()) {
             latestBacktestedDay = getNextBacktestedDay(marketDaysIterator.next(), latestBacktestedDay, latestTransactionPrice);
-            days.add(latestBacktestedDay);
+            backtestedDays.add(latestBacktestedDay);
             if (latestBacktestedDay.transaction() != null) {
                 latestTransactionPrice = latestBacktestedDay.marketDay().getClose();
             }
         }
 
-        return new StockMarketBacktestResult(days);
+        return new StockMarketBacktestResult(backtestedDays);
     }
 
-    private BacktestedDay getInitialBacktestedDay(Double initialBudget, MarketPriceTimeSeriesItem initialMarketDay) {
+    private BacktestedDay getInitialBacktestedDay(Double initialBudget, MarketDay initialMarketDay) {
         Double price = initialMarketDay.getClose();
         double quantity = calculateQuantity(Math.min(buyValue, initialBudget), price);
         Double remainingBudget = initialBudget - quantity * price;
         return new BacktestedDay(initialMarketDay, new Transaction(TradeDirection.BUY, quantity, price), remainingBudget, quantity);
     }
 
-    private BacktestedDay getNextBacktestedDay(MarketPriceTimeSeriesItem marketDay, BacktestedDay latestBacktestedDay, Double latestTransactionPrice) {
+    private BacktestedDay getNextBacktestedDay(MarketDay marketDay, BacktestedDay latestBacktestedDay, Double latestTransactionPrice) {
         Double price = marketDay.getClose();
         if (price >= latestTransactionPrice * (1 + relativeJumpTriggeringSell)) {
             return latestBacktestedDay.buy(calculateQuantity(buyValue, price), marketDay);

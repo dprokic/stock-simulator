@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface MarketPriceFetcher {
 
-    List<MarketPriceTimeSeriesItem> getMarketPriceTimeSeries(Ticker ticker);
+    List<MarketDay> getMarketPriceTimeSeries(Ticker ticker);
 
 }

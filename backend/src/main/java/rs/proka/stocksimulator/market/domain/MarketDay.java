@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Builder
 @Getter
-public class MarketPriceTimeSeriesItem {
+public class MarketDay {
 
     private final LocalDate date;
     private final Double open;

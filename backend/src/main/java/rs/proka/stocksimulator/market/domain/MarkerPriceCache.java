@@ -10,7 +10,7 @@ import java.util.Map;
 @Component
 public class MarkerPriceCache {
 
-    private Map<Ticker, List<MarketPriceTimeSeriesItem>> cache;
+    private Map<Ticker, List<MarketDay>> cache;
 
     @Value("${stock.cache.maxSize}")
     private Integer maxSize;
@@ -18,7 +18,7 @@ public class MarkerPriceCache {
     public MarkerPriceCache() {
         cache = new LinkedHashMap<>() {
             @Override
-            protected boolean removeEldestEntry(Map.Entry<Ticker, List<MarketPriceTimeSeriesItem>> eldest) {
+            protected boolean removeEldestEntry(Map.Entry<Ticker, List<MarketDay>> eldest) {
                 return size() > maxSize;
             }
         };
@@ -28,11 +28,11 @@ public class MarkerPriceCache {
         return cache.containsKey(ticker);
     }
 
-    public List<MarketPriceTimeSeriesItem> get(Ticker ticker) {
+    public List<MarketDay> get(Ticker ticker) {
         return cache.get(ticker);
     }
 
-    public void put(Ticker ticker, List<MarketPriceTimeSeriesItem> marketPriceTimeSeriesItems) {
-        cache.put(ticker, marketPriceTimeSeriesItems);
+    public void put(Ticker ticker, List<MarketDay> marketDays) {
+        cache.put(ticker, marketDays);
     }
 }

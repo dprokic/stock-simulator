@@ -1,10 +1,10 @@
 package rs.proka.stocksimulator.backtest.domain;
 
-import rs.proka.stocksimulator.market.domain.MarketPriceTimeSeriesItem;
+import rs.proka.stocksimulator.market.domain.MarketDay;
 
-public record BacktestedDay(MarketPriceTimeSeriesItem marketDay, Transaction transaction, Double remainingBudget, Double instrumentsQuantity) {
+public record BacktestedDay(MarketDay marketDay, Transaction transaction, Double remainingBudget, Double instrumentsQuantity) {
 
-    public BacktestedDay buy(Double quantity, MarketPriceTimeSeriesItem marketDay) {
+    public BacktestedDay buy(Double quantity, MarketDay marketDay) {
         double actualQuantity = Math.min(quantity, remainingBudget / marketDay.getClose());
         double newInstrumentsQuantity = instrumentsQuantity + actualQuantity;
         Transaction newTransaction = new Transaction(TradeDirection.BUY, actualQuantity, marketDay.getClose());
@@ -12,7 +12,7 @@ public record BacktestedDay(MarketPriceTimeSeriesItem marketDay, Transaction tra
         return new BacktestedDay(marketDay, newTransaction, newRemainingBudget, newInstrumentsQuantity);
     }
 
-    public BacktestedDay sell(Double quantity, MarketPriceTimeSeriesItem marketDay) {
+    public BacktestedDay sell(Double quantity, MarketDay marketDay) {
         double newInstrumentsQuantity = instrumentsQuantity - quantity;
         if (newInstrumentsQuantity < 0.0) {
             newInstrumentsQuantity = 0.0;
@@ -23,13 +23,13 @@ public record BacktestedDay(MarketPriceTimeSeriesItem marketDay, Transaction tra
         return new BacktestedDay(marketDay, newTransaction, newRemainingBudget, newInstrumentsQuantity);
     }
 
-    public BacktestedDay skip(MarketPriceTimeSeriesItem marketDay) {
+    public BacktestedDay skip(MarketDay marketDay) {
         return new BacktestedDay(marketDay, null, remainingBudget, instrumentsQuantity);
     }
 
     // TODO: Find solution to remove getters which are used because hasProperty matcher requires java bean, which records are not
 
-    public MarketPriceTimeSeriesItem getMarketDay() {
+    public MarketDay getMarketDay() {
         return marketDay;
     }
 
