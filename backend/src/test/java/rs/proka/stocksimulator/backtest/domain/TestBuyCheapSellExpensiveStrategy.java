@@ -16,25 +16,40 @@ import static org.hamcrest.Matchers.*;
 class TestBuyCheapSellExpensiveStrategy {
 
     @Test
-    void testStableMarket() {
+    void testTransactionsInStableMarket() {
         BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(1000.0, 0.3, 0.5, 100.0, 100.0);
-
         List<MarketDayAdjusted> marketDays = buildMarketDays(List.of(100.0, 100.0, 100.0, 100.0, 100.0));
 
         StockMarketBacktestResult backtestResult = algorithm.backtest(marketDays);
 
-        assertThat(backtestResult.days().size(), is(5));
-        Transaction expectedFirstTransaction = new Transaction(TradeDirection.BUY, 1.0, 100.0);
-        assertThat(backtestResult.days(), contains(hasProperty("transaction", is(expectedFirstTransaction)),
+        assertThat(backtestResult.days(), contains(hasProperty("transaction", is(new Transaction(TradeDirection.BUY, 1.0, 100.0))),
                 hasProperty("transaction", nullValue()),
                 hasProperty("transaction", nullValue()),
                 hasProperty("transaction", nullValue()),
                 hasProperty("transaction", nullValue())));
+    }
+
+    @Test
+    void testInstrumentsQuantityInStableMarket() {
+        BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(1000.0, 0.3, 0.5, 100.0, 100.0);
+        List<MarketDayAdjusted> marketDays = buildMarketDays(List.of(100.0, 100.0, 100.0, 100.0, 100.0));
+
+        StockMarketBacktestResult backtestResult = algorithm.backtest(marketDays);
+
         assertThat(backtestResult.days(), contains(hasProperty("instrumentsQuantity", is(1.0)),
                 hasProperty("instrumentsQuantity", is(1.0)),
                 hasProperty("instrumentsQuantity", is(1.0)),
                 hasProperty("instrumentsQuantity", is(1.0)),
                 hasProperty("instrumentsQuantity", is(1.0))));
+    }
+
+    @Test
+    void testRemainingBudgetInStableMarket() {
+        BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(1000.0, 0.3, 0.5, 100.0, 100.0);
+        List<MarketDayAdjusted> marketDays = buildMarketDays(List.of(100.0, 100.0, 100.0, 100.0, 100.0));
+
+        StockMarketBacktestResult backtestResult = algorithm.backtest(marketDays);
+
         assertThat(backtestResult.days(), contains(hasProperty("remainingBudget", is(900.0)),
                 hasProperty("remainingBudget", is(900.0)),
                 hasProperty("remainingBudget", is(900.0)),
@@ -43,24 +58,40 @@ class TestBuyCheapSellExpensiveStrategy {
     }
 
     @Test
-    void testBullMarket() {
+    void testTransactionsInBullMarket() {
         BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(1000.0, 0.3, 0.5, 100.0, 100.0);
-
         List<MarketDayAdjusted> marketPricesForTimeInterval = buildMarketDays(List.of(100.0, 149.9, 150.0, 225.0, 337.5));
 
         StockMarketBacktestResult backtestResult = algorithm.backtest(marketPricesForTimeInterval);
 
-        assertThat(backtestResult.days().size(), is(5));
         assertThat(backtestResult.days(), contains(hasProperty("transaction", is(new Transaction(TradeDirection.BUY, 1.0, 100.0))),
                 hasProperty("transaction", nullValue()),
                 hasProperty("transaction", is(new Transaction(TradeDirection.BUY, 1.0 / 1.5, 150.0))),
                 hasProperty("transaction", is(new Transaction(TradeDirection.BUY, 1.0 / 2.25, 225.0))),
                 hasProperty("transaction", is(new Transaction(TradeDirection.BUY, 1.0 / 3.375, 337.5)))));
+    }
+
+    @Test
+    void testInstrumentsQuantityInBullMarket() {
+        BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(1000.0, 0.3, 0.5, 100.0, 100.0);
+        List<MarketDayAdjusted> marketPricesForTimeInterval = buildMarketDays(List.of(100.0, 149.9, 150.0, 225.0, 337.5));
+
+        StockMarketBacktestResult backtestResult = algorithm.backtest(marketPricesForTimeInterval);
+
         assertThat(backtestResult.days(), contains(hasProperty("instrumentsQuantity", is(1.0)),
                 hasProperty("instrumentsQuantity", is(1.0)),
                 hasProperty("instrumentsQuantity", is(1.0 + 1.0 / 1.5)),
                 hasProperty("instrumentsQuantity", is(1.0 + 1.0 / 1.5 + 1.0 / 2.25)),
                 hasProperty("instrumentsQuantity", is(1.0 + 1.0 / 1.5 + 1.0 / 2.25 + 1.0 / 3.375))));
+    }
+
+    @Test
+    void testRemainingBudgetInBullMarket() {
+        BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(1000.0, 0.3, 0.5, 100.0, 100.0);
+        List<MarketDayAdjusted> marketPricesForTimeInterval = buildMarketDays(List.of(100.0, 149.9, 150.0, 225.0, 337.5));
+
+        StockMarketBacktestResult backtestResult = algorithm.backtest(marketPricesForTimeInterval);
+
         assertThat(backtestResult.days(), contains(hasProperty("remainingBudget", is(900.0)),
                 hasProperty("remainingBudget", is(900.0)),
                 hasProperty("remainingBudget", is(800.0)),
@@ -69,25 +100,45 @@ class TestBuyCheapSellExpensiveStrategy {
     }
 
     @Test
-    void testBearMarket() {
+    void testTransactionsInBearMarket() {
         BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(1000.0, 0.3, 0.5, 100.0, 100.0);
 
         List<MarketDayAdjusted> marketPricesForTimeInterval = buildMarketDays(List.of(100.0, 150.0, 105.1, 105.0, 73.5));
 
         StockMarketBacktestResult backtestResult = algorithm.backtest(marketPricesForTimeInterval);
 
-        assertThat(backtestResult.days().size(), is(5));
-        double expectedInstrumentsQuantityDay4 = 1.0 + 1.0 / 1.5 - 1.0 / 1.05;
+        double instrumentsQuantityBeforeLastTransaction = 1.0 + 1.0 / 1.5 - 1.0 / 1.05;
         assertThat(backtestResult.days(), contains(hasProperty("transaction", is(new Transaction(TradeDirection.BUY, 1.0, 100.0))),
                 hasProperty("transaction", is(new Transaction(TradeDirection.BUY, 1.0 / 1.5, 150.0))),
                 hasProperty("transaction", nullValue()),
                 hasProperty("transaction", is(new Transaction(TradeDirection.SELL, 1.0 / 1.05, 105.0))),
-                hasProperty("transaction", is(new Transaction(TradeDirection.SELL, expectedInstrumentsQuantityDay4, 73.5)))));
+                hasProperty("transaction", is(new Transaction(TradeDirection.SELL, instrumentsQuantityBeforeLastTransaction, 73.5)))));
+    }
+
+    @Test
+    void testInstrumentsQuantityInBearMarket() {
+        BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(1000.0, 0.3, 0.5, 100.0, 100.0);
+
+        List<MarketDayAdjusted> marketPricesForTimeInterval = buildMarketDays(List.of(100.0, 150.0, 105.1, 105.0, 73.5));
+
+        StockMarketBacktestResult backtestResult = algorithm.backtest(marketPricesForTimeInterval);
+
         assertThat(backtestResult.days(), contains(hasProperty("instrumentsQuantity", is(1.0)),
                 hasProperty("instrumentsQuantity", is(1.0 + 1.0 / 1.5)),
                 hasProperty("instrumentsQuantity", is(1.0 + 1.0 / 1.5)),
-                hasProperty("instrumentsQuantity", is(expectedInstrumentsQuantityDay4)),
+                hasProperty("instrumentsQuantity", is(1.0 + 1.0 / 1.5 - 1.0 / 1.05)),
                 hasProperty("instrumentsQuantity", is(0.0))));
+    }
+
+    @Test
+    void testRemainingBudgetInBearMarket() {
+        BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(1000.0, 0.3, 0.5, 100.0, 100.0);
+
+        List<MarketDayAdjusted> marketPricesForTimeInterval = buildMarketDays(List.of(100.0, 150.0, 105.1, 105.0, 73.5));
+
+        StockMarketBacktestResult backtestResult = algorithm.backtest(marketPricesForTimeInterval);
+
+        double expectedInstrumentsQuantityDay4 = 1.0 + 1.0 / 1.5 - 1.0 / 1.05;
         assertThat(backtestResult.days(), contains(hasProperty("remainingBudget", is(900.0)),
                 hasProperty("remainingBudget", is(800.0)),
                 hasProperty("remainingBudget", is(800.0)),
@@ -98,7 +149,6 @@ class TestBuyCheapSellExpensiveStrategy {
     @Test
     void testNotEnoughInitialBudget() {
         BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(50.0, 0.3, 0.5, 100.0, 100.0);
-
         List<MarketDayAdjusted> marketPricesForTimeInterval = buildMarketDays(List.of(100.0));
 
         StockMarketBacktestResult backtestResult = algorithm.backtest(marketPricesForTimeInterval);
@@ -110,18 +160,34 @@ class TestBuyCheapSellExpensiveStrategy {
     }
 
     @Test
-    void testNotEnoughBudgetLater() {
+    void testTransactionsWhenNotEnoughBudgetLater() {
         BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(150.0, 0.3, 0.5, 100.0, 100.0);
-
         List<MarketDayAdjusted> marketPricesForTimeInterval = buildMarketDays(List.of(100.0, 150.0));
 
         StockMarketBacktestResult backtestResult = algorithm.backtest(marketPricesForTimeInterval);
 
-        assertThat(backtestResult.days().size(), is(2));
         assertThat(backtestResult.days(), contains(hasProperty("transaction", is(new Transaction(TradeDirection.BUY, 1.0, 100.0))),
                 hasProperty("transaction", is(new Transaction(TradeDirection.BUY, 50.0 / 150.0, 150.0)))));
+    }
+
+    @Test
+    void testInstrumentsQuantityWhenNotEnoughBudgetLater() {
+        BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(150.0, 0.3, 0.5, 100.0, 100.0);
+        List<MarketDayAdjusted> marketPricesForTimeInterval = buildMarketDays(List.of(100.0, 150.0));
+
+        StockMarketBacktestResult backtestResult = algorithm.backtest(marketPricesForTimeInterval);
+
         assertThat(backtestResult.days(), contains(hasProperty("instrumentsQuantity", is(1.0)),
                 hasProperty("instrumentsQuantity", is(1.0 + 50.0 / 150.0))));
+    }
+
+    @Test
+    void testRemainingBudgetWhenNotEnoughBudgetLater() {
+        BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(150.0, 0.3, 0.5, 100.0, 100.0);
+        List<MarketDayAdjusted> marketPricesForTimeInterval = buildMarketDays(List.of(100.0, 150.0));
+
+        StockMarketBacktestResult backtestResult = algorithm.backtest(marketPricesForTimeInterval);
+
         assertThat(backtestResult.days(), contains(hasProperty("remainingBudget", is(50.0)),
                 hasProperty("remainingBudget", is(0.0))));
     }
