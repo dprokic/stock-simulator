@@ -40,7 +40,6 @@ public class BacktestController {
                                                        @RequestParam LocalDate intervalEndDate,
                                                        @RequestParam String strategy,
                                                        @RequestParam(required = true) Map<String, String> customParams) {
-        log.info("Custom params: {}", customParams);
         return StockMarketBacktestResultDto.fromBacktestResult(backtestService.getStrategyBacktested(new Ticker(symbol), intervalStartDate, intervalEndDate, strategy, customParams));
     }
 
