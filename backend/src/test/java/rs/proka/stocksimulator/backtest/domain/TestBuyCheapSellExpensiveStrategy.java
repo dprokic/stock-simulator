@@ -2,6 +2,7 @@ package rs.proka.stocksimulator.backtest.domain;
 
 import org.junit.jupiter.api.Test;
 import rs.proka.stocksimulator.market.domain.MarketDay;
+import rs.proka.stocksimulator.market.domain.MarketDayAdjusted;
 
 import java.time.LocalDate;
 import java.util.LinkedList;
@@ -16,7 +17,7 @@ class TestBuyCheapSellExpensiveStrategy {
     void testStableMarket() {
         BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(1000.0, 0.3, 0.5, 100.0, 100.0);
 
-        List<MarketDay> marketPricesForTimeInterval = new LinkedList<>();
+        List<MarketDayAdjusted> marketPricesForTimeInterval = new LinkedList<>();
         marketPricesForTimeInterval.add(buildMarketDay(LocalDate.of(2023, 1, 1), 100.0));
         marketPricesForTimeInterval.add(buildMarketDay(LocalDate.of(2023, 1, 2), 100.0));
         marketPricesForTimeInterval.add(buildMarketDay(LocalDate.of(2023, 1, 3), 100.0));
@@ -48,7 +49,7 @@ class TestBuyCheapSellExpensiveStrategy {
     void testBullMarket() {
         BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(1000.0, 0.3, 0.5, 100.0, 100.0);
 
-        List<MarketDay> marketPricesForTimeInterval = new LinkedList<>();
+        List<MarketDayAdjusted> marketPricesForTimeInterval = new LinkedList<>();
         marketPricesForTimeInterval.add(buildMarketDay(LocalDate.of(2023, 1, 1), 100.0));
         marketPricesForTimeInterval.add(buildMarketDay(LocalDate.of(2023, 1, 2), 149.9));
         marketPricesForTimeInterval.add(buildMarketDay(LocalDate.of(2023, 1, 3), 150.0));
@@ -79,7 +80,7 @@ class TestBuyCheapSellExpensiveStrategy {
     void testBearMarket() {
         BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(1000.0, 0.3, 0.5, 100.0, 100.0);
 
-        List<MarketDay> marketPricesForTimeInterval = new LinkedList<>();
+        List<MarketDayAdjusted> marketPricesForTimeInterval = new LinkedList<>();
         marketPricesForTimeInterval.add(buildMarketDay(LocalDate.of(2023, 1, 1), 100.0));
         marketPricesForTimeInterval.add(buildMarketDay(LocalDate.of(2023, 1, 2), 150.0));
         marketPricesForTimeInterval.add(buildMarketDay(LocalDate.of(2023, 1, 3), 105.1));
@@ -111,7 +112,7 @@ class TestBuyCheapSellExpensiveStrategy {
     void testNotEnoughInitialBudget() {
         BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(50.0, 0.3, 0.5, 100.0, 100.0);
 
-        List<MarketDay> marketPricesForTimeInterval = new LinkedList<>();
+        List<MarketDayAdjusted> marketPricesForTimeInterval = new LinkedList<>();
         marketPricesForTimeInterval.add(buildMarketDay(LocalDate.of(2023, 1, 1), 100.0));
 
         StockMarketBacktestResult backtestResult = algorithm.backtest(marketPricesForTimeInterval);
@@ -126,7 +127,7 @@ class TestBuyCheapSellExpensiveStrategy {
     void testNotEnoughBudgetLater() {
         BuyCheapSellExpensiveStrategy algorithm = new BuyCheapSellExpensiveStrategy(150.0, 0.3, 0.5, 100.0, 100.0);
 
-        List<MarketDay> marketPricesForTimeInterval = new LinkedList<>();
+        List<MarketDayAdjusted> marketPricesForTimeInterval = new LinkedList<>();
         marketPricesForTimeInterval.add(buildMarketDay(LocalDate.of(2023, 1, 1), 100.0));
         marketPricesForTimeInterval.add(buildMarketDay(LocalDate.of(2023, 1, 2), 150.0));
 
@@ -141,15 +142,15 @@ class TestBuyCheapSellExpensiveStrategy {
                 hasProperty("remainingBudget", is(0.0))));
     }
 
-    private MarketDay buildMarketDay(LocalDate date, double price) {
-        return MarketDay.builder()
+    private MarketDayAdjusted buildMarketDay(LocalDate date, double price) {
+        return new MarketDayAdjusted(MarketDay.builder()
                 .date(date)
                 .open(price)
                 .low(price)
                 .high(price)
                 .close(price)
                 .volume(10L)
-                .build();
+                .build(), price);
     }
 
 }

@@ -11,7 +11,7 @@ public record BacktestedDayDto(StockMarketPriceTimeSeriesItemDto marketDay, Tran
         }
         StockMarketPriceTimeSeriesItemDto marketDay = StockMarketPriceTimeSeriesItemDto.fromItem(day.marketDay());
         TransactionDto transaction = TransactionDto.fromTransaction(day.getTransaction());
-        double instrumentsValue = day.getInstrumentsQuantity() * day.marketDay().getClose();
+        double instrumentsValue = day.getInstrumentsQuantity() * day.marketDay().adjustedClose();
         double totalValue = day.remainingBudget() + instrumentsValue;
         return new BacktestedDayDto(marketDay, transaction, day.remainingBudget(), day.getInstrumentsQuantity(),
                 instrumentsValue, totalValue);

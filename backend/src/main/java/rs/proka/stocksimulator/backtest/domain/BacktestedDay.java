@@ -1,35 +1,35 @@
 package rs.proka.stocksimulator.backtest.domain;
 
-import rs.proka.stocksimulator.market.domain.MarketDay;
+import rs.proka.stocksimulator.market.domain.MarketDayAdjusted;
 
-public record BacktestedDay(MarketDay marketDay, Transaction transaction, Double remainingBudget, Double instrumentsQuantity) {
+public record BacktestedDay(MarketDayAdjusted marketDay, Transaction transaction, Double remainingBudget, Double instrumentsQuantity) {
 
-    public BacktestedDay buy(Double quantity, MarketDay marketDay) {
-        double actualQuantity = Math.min(quantity, remainingBudget / marketDay.getClose());
+    public BacktestedDay buy(Double quantity, MarketDayAdjusted marketDay) {
+        double actualQuantity = Math.min(quantity, remainingBudget / marketDay.adjustedClose());
         double newInstrumentsQuantity = instrumentsQuantity + actualQuantity;
-        Transaction newTransaction = new Transaction(TradeDirection.BUY, actualQuantity, marketDay.getClose());
-        double newRemainingBudget = remainingBudget - actualQuantity * marketDay.getClose();
+        Transaction newTransaction = new Transaction(TradeDirection.BUY, actualQuantity, marketDay.adjustedClose());
+        double newRemainingBudget = remainingBudget - actualQuantity * marketDay.adjustedClose();
         return new BacktestedDay(marketDay, newTransaction, newRemainingBudget, newInstrumentsQuantity);
     }
 
-    public BacktestedDay sell(Double quantity, MarketDay marketDay) {
+    public BacktestedDay sell(Double quantity, MarketDayAdjusted marketDay) {
         double newInstrumentsQuantity = instrumentsQuantity - quantity;
         if (newInstrumentsQuantity < 0.0) {
             newInstrumentsQuantity = 0.0;
         }
         double quantityToSell = instrumentsQuantity - newInstrumentsQuantity;
-        Transaction newTransaction = new Transaction(TradeDirection.SELL, quantityToSell, marketDay.getClose());
-        double newRemainingBudget = remainingBudget + quantityToSell * marketDay.getClose();
+        Transaction newTransaction = new Transaction(TradeDirection.SELL, quantityToSell, marketDay.adjustedClose());
+        double newRemainingBudget = remainingBudget + quantityToSell * marketDay.adjustedClose();
         return new BacktestedDay(marketDay, newTransaction, newRemainingBudget, newInstrumentsQuantity);
     }
 
-    public BacktestedDay skip(MarketDay marketDay) {
+    public BacktestedDay skip(MarketDayAdjusted marketDay) {
         return new BacktestedDay(marketDay, null, remainingBudget, instrumentsQuantity);
     }
 
     // TODO: Find solution to remove getters which are used because hasProperty matcher requires java bean, which records are not
 
-    public MarketDay getMarketDay() {
+    public MarketDayAdjusted getMarketDay() {
         return marketDay;
     }
 

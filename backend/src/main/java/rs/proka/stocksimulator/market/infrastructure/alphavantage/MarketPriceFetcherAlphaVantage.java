@@ -1,17 +1,21 @@
 package rs.proka.stocksimulator.market.infrastructure.alphavantage;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import rs.proka.stocksimulator.market.domain.MarketPriceFetcher;
-import rs.proka.stocksimulator.market.domain.MarketDay;
-import rs.proka.stocksimulator.market.domain.Ticker;
+import rs.proka.stocksimulator.market.domain.*;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class MarketPriceFetcherAlphaVantage implements MarketPriceFetcher {
+
+    private final StockSplitRepository stockSplitRepository;
+
     @Override
     public List<MarketDay> getMarketPriceTimeSeries(Ticker ticker) {
         LinkedList<MarketDay> transformedItems = new LinkedList<>();
@@ -50,5 +54,26 @@ public class MarketPriceFetcherAlphaVantage implements MarketPriceFetcher {
         }
         transformedItems.sort(Comparator.comparing(MarketDay::getDate));
         return transformedItems;
+    }
+
+    @Override
+    public List<MarketDayAdjusted> getMarketPriceTimeSeriesAdjusted(Ticker ticker) {
+        Map<LocalDate, StockSplitValue> splitsPerDate = stockSplitRepository.getAllForTicker(ticker)
+                .map(StockSplit::splits)
+                .orElseThrow(() -> new IllegalStateException("No stock split data for requested ticker"))
+                .stream()
+                .collect(Collectors.toMap(StockSplitValue::date, split -> split));
+        List<MarketDay> marketDays = getMarketPriceTimeSeries(ticker);
+        marketDays.sort(Comparator.comparing(MarketDay::getDate).reversed());
+        List<MarketDayAdjusted> marketDaysAdjusted = new LinkedList<>();
+        double cumulativeMultiple = 1.0;
+        for (MarketDay marketDay: marketDays) {
+            if (splitsPerDate.containsKey(marketDay.getDate())) {
+                cumulativeMultiple *= splitsPerDate.get(marketDay.getDate()).ratio();
+            }
+            marketDaysAdjusted.add(new MarketDayAdjusted(marketDay, marketDay.getClose() / cumulativeMultiple));
+        }
+        marketDaysAdjusted.sort(Comparator.comparing(MarketDayAdjusted::date));
+        return marketDaysAdjusted;
     }
 }

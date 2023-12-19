@@ -6,4 +6,5 @@ public interface MarketPriceFetcher {
 
     List<MarketDay> getMarketPriceTimeSeries(Ticker ticker);
 
+    List<MarketDayAdjusted> getMarketPriceTimeSeriesAdjusted(Ticker ticker);
 }
